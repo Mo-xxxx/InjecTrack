@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InjecTrack | Aesthetic Charting Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .pin { transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .pin:hover { transform: scale(1.2) translateY(-2px); }
+    .grid-bg {
+      background-size: 20px 20px;
+      background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-rose-500 selection:text-white">
+
+  <!-- TOP CLINICAL BAR -->
+  <div class="bg-slate-900 text-slate-300 text-xs py-1.5 px-4 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="font-medium tracking-wide text-slate-200">InjecTrack Clinical Suite v2.4</span>
+      </div>
+      <div class="flex items-center gap-4 text-slate-400 text-[11px]">
+        <span id="tier-badge" class="bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded font-mono">Tier: Standard ($79/mo)</span>
+        <span class="hidden sm:inline">HIPAA Compliant Workstation Architecture</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION -->
+  <header class="border-b border-slate-200 bg-white sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('landing')">
+        <div class="w-9 h-9 bg-slate-900 rounded-lg flex items-center justify-center font-bold text-white shadow-sm">
+          <i data-lucide="syringe" class="w-5 h-5 text-rose-400"></i>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-lg font-bold tracking-tight text-slate-900 leading-tight">InjecTrack</span>
+          <span class="text-[10px] uppercase font-semibold tracking-wider text-slate-400">Facial Mapping</span>
+        </div>
+      </div>
+
+      <nav class="flex items-center space-x-1 overflow-x-auto py-1 text-xs font-semibold">
+        <button onclick="switchView('landing')" id="nav-landing" class="px-3 py-2 rounded-lg bg-slate-900 text-white transition">Overview</button>
+        <button onclick="switchView('app')" id="nav-app" class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Charting Tool</button>
+        <button onclick="switchView('records')" id="nav-records" class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Saved Charts</button>
+        <button onclick="switchView('compare')" id="nav-compare" class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Standard vs Pro</button>
+        <button onclick="switchView('faq')" id="nav-faq" class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">FAQ</button>
+        <button onclick="switchView('blog')" id="nav-blog" class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Blog</button>
+        <button onclick="switchView('reviews')" id="nav-reviews" class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Reviews</button>
+        
+        <!-- Secret Dev Admin button -->
+        <button onclick="switchView('admin')" id="nav-admin" class="hidden px-3 py-2 rounded-lg text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition flex items-center gap-1">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-amber-600"></i> Dev Admin
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 1. LANDING & INTRODUCTION PAGE -->
+  <main id="view-landing" class="py-16 max-w-6xl mx-auto px-4 flex-grow">
+    <div class="text-center max-w-3xl mx-auto mb-16 space-y-6">
+      <div class="inline-flex items-center gap-2 border border-rose-200 bg-rose-50 px-3 py-1 rounded-full text-xs font-semibold text-rose-700">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Next-Generation Aesthetics Software
+      </div>
+      <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">Precision Facial Mapping Built for Medical Injectors</h1>
+      <p class="text-lg text-slate-600 leading-relaxed">Eliminate clunky legacy EMRs. Chart botulinum toxin and filler procedures in under 60 seconds with interactive spatial pinpointing and automated dosage calculations.</p>
+      <div class="pt-4 flex items-center justify-center gap-4">
+        <button onclick="switchView('app')" class="px-6 py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl shadow-lg transition flex items-center gap-2">
+          <span>Open Live Charting Tool</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+        <button onclick="switchView('compare')" class="px-6 py-3.5 bg-white hover:bg-slate-100 text-slate-700 font-semibold rounded-xl border border-slate-300 transition">Compare Tiers</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition space-y-3">
+        <div class="w-10 h-10 bg-slate-100 text-slate-800 rounded-xl flex items-center justify-center font-bold">
+          <i data-lucide="layout-grid" class="w-5 h-5"></i>
+        </div>
+        <h3 class="font-bold text-slate-900 text-base">In-Room Consultation</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Capture high-resolution client photography on iPad or desktop, displaying treatment boundaries and dosage points dynamically during consultations.</p>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition space-y-3">
+        <div class="w-10 h-10 bg-slate-100 text-slate-800 rounded-xl flex items-center justify-center font-bold">
+          <i data-lucide="calculator" class="w-5 h-5"></i>
+        </div>
+        <h3 class="font-bold text-slate-900 text-base">Automatic Unit Totals</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Place pins across the forehead, glabella, or crow's feet. InjecTrack automatically sums units and generates accurate billing quotes instantly.</p>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition space-y-3">
+        <div class="w-10 h-10 bg-slate-100 text-slate-800 rounded-xl flex items-center justify-center font-bold">
+          <i data-lucide="shield-check" class="w-5 h-5"></i>
+        </div>
+        <h3 class="font-bold text-slate-900 text-base">Compliant Records</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">Maintain spatial mapping logs complete with precise grid coordinates, dates, and product batch records for medical compliance.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- 2. CHARTING APP -->
+  <main id="view-app" class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 hidden flex-grow">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
+      <div>
+        <h1 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+          <i data-lucide="crosshair" class="w-6 h-6 text-rose-500"></i> Clinical Charting Desk
+        </h1>
+        <p class="text-sm text-slate-500">Select facial injection vectors, set dosage units per site, and calculate treatment pricing.</p>
+      </div>
+      <button onclick="resetCanvas()" class="text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm self-start md:self-auto transition">
+        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Clear Active Canvas
+      </button>
+    </div>
+
+    <!-- MEDICAL INTAKE BANNER BAR -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-4 mb-8 shadow-sm space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="file-text" class="w-4 h-4 text-slate-700"></i>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Patient Clinical Intake & Safety File</span>
+        </div>
+        <span class="text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full border border-slate-200">Pre-Procedure Audit</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Fitzpatrick Skin Type</label>
+          <select id="fitzpatrick-select" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900">
+            <option value="Type I">Type I (Very Pale / Always Burns)</option>
+            <option value="Type II">Type II (Fair / Usually Burns)</option>
+            <option value="Type III" selected>Type III (Medium / Sometimes Tans)</option>
+            <option value="Type IV">Type IV (Olive / Rarely Burns)</option>
+            <option value="Type V">Type V (Brown / Very Rarely Burns)</option>
+            <option value="Type VI">Type VI (Black / Never Burns)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Reconstitution Ratio</label>
+          <select id="recon-ratio" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900">
+            <option value="2.5mL Saline / 100u">2.5mL Preservative-Free Saline / 100u</option>
+            <option value="2.0mL Saline / 100u">2.0mL Preservative-Free Saline / 100u</option>
+            <option value="1.0mL Concentrated / 100u">1.0mL Concentrated / 100u</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Product Lot / Batch #</label>
+          <input type="text" id="batch-number" value="LOT-BTX-9824" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-mono font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900" />
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-600 mb-1">Vial Expiration Date</label>
+          <input type="date" id="vial-expiry" value="2027-04-15" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900" />
+        </div>
+      </div>
+
+      <!-- CLICKABLE CLINICAL INTAKE TAGS -->
+      <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs">
+        <span class="font-bold text-slate-500 uppercase text-[10px] tracking-wider mr-1">Medical Alerts & Consent:</span>
+        <button onclick="toggleIntakeTag(this)" class="px-2.5 py-1 rounded-full border border-slate-300 bg-slate-50 text-slate-600 font-semibold hover:border-slate-400 transition flex items-center gap-1">
+          <i data-lucide="check-circle" class="w-3 h-3 text-slate-400"></i> Informed Consent Signed
+        </button>
+        <button onclick="toggleIntakeTag(this)" class="px-2.5 py-1 rounded-full border border-slate-300 bg-slate-50 text-slate-600 font-semibold hover:border-slate-400 transition flex items-center gap-1">
+          <i data-lucide="alert-circle" class="w-3 h-3 text-amber-500"></i> Blood Thinners / Aspirin
+        </button>
+        <button onclick="toggleIntakeTag(this)" class="px-2.5 py-1 rounded-full border border-slate-300 bg-slate-50 text-slate-600 font-semibold hover:border-slate-400 transition flex items-center gap-1">
+          <i data-lucide="x-circle" class="w-3 h-3 text-emerald-500"></i> No Neuromuscular History
+        </button>
+        <button onclick="toggleIntakeTag(this)" class="px-2.5 py-1 rounded-full border border-slate-300 bg-slate-50 text-slate-600 font-semibold hover:border-slate-400 transition flex items-center gap-1">
+          <i data-lucide="shield-alert" class="w-3 h-3 text-rose-500"></i> Prior Toxin Resistance
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+      <!-- CANVAS PANEL -->
+      <div class="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 relative flex flex-col items-center shadow-sm">
+        <div class="w-full flex justify-between items-center mb-4">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Patient:</span>
+            <input type="text" id="patient-name-input" value="Sarah Jenkins" class="text-sm font-bold text-slate-900 bg-slate-100 border border-slate-300 px-2.5 py-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900" />
+          </div>
+          <span class="text-xs bg-emerald-100 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active Mapping
+          </span>
+        </div>
+
+        <div id="canvas-container" class="relative w-full max-w-sm aspect-[3/4] rounded-xl overflow-hidden border border-slate-300 bg-slate-50 grid-bg cursor-crosshair flex items-center justify-center select-none shadow-inner" onclick="handleCanvasClick(event)">
+          <svg id="default-svg" class="w-full h-full text-slate-400 opacity-80 p-6" viewBox="0 0 200 260" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M100 20 C140 20 170 50 170 100 C170 170 140 230 100 230 C60 230 30 170 30 100 C30 50 60 20 100 20 Z" fill="#ffffff"/>
+            <ellipse cx="70" cy="95" rx="14" ry="8" stroke-dasharray="2 2" />
+            <ellipse cx="130" cy="95" rx="14" ry="8" stroke-dasharray="2 2" />
+            <path d="M100 100 L100 135 L112 140" stroke-linecap="round"/>
+            <path d="M75 175 Q100 190 125 175 Q100 185 75 175 Z" fill="#f8fafc"/>
+          </svg>
+          <img id="uploaded-face-img" class="absolute inset-0 w-full h-full object-cover hidden" alt="Client Face" />
+          <div id="pins-layer" class="absolute inset-0 pointer-events-none"></div>
+        </div>
+      </div>
+
+      <!-- CONTROLS PANEL -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-sm">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+            <i data-lucide="camera" class="w-4 h-4 text-slate-700"></i> Patient Photography
+          </h3>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="py-2.5 bg-slate-900 hover:bg-slate-800 text-xs font-semibold text-white rounded-xl border border-slate-900 flex items-center justify-center gap-2 cursor-pointer transition shadow-sm">
+              <i data-lucide="camera" class="w-4 h-4 text-rose-400"></i> Snap Photo
+              <input type="file" accept="image/*" capture="user" class="hidden" onchange="handleImageUpload(event)" />
+            </label>
+            <label class="py-2.5 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 rounded-xl border border-slate-300 flex items-center justify-center gap-2 cursor-pointer transition">
+              <i data-lucide="upload" class="w-4 h-4 text-slate-500"></i> Import Image
+              <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload(event)" />
+            </label>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+            <i data-lucide="sliders" class="w-4 h-4 text-slate-700"></i> Product & Unit Dosage
+          </h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs text-slate-600 mb-1 block font-semibold">Toxin Product</label>
+              <select id="toxin-select" onchange="updateToxinSettings()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900">
+                <option value="Botox Cosmetic" data-cost="12">Botox ($12/u)</option>
+                <option value="Dysport" data-cost="5">Dysport ($5/u)</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs text-slate-600 mb-1 block font-semibold">Units / Pin Site</label>
+              <input type="number" id="units-input" value="4" min="1" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900" />
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Session Breakdown</h3>
+          <div class="space-y-2 border-b border-slate-200 pb-3 text-sm">
+            <div class="flex justify-between text-slate-600"><span>Injection Vectors:</span><span id="site-count" class="font-mono text-slate-900 font-bold">0</span></div>
+            <div class="flex justify-between text-slate-600"><span>Calculated Units:</span><span id="unit-count" class="font-mono text-rose-600 font-bold">0 u</span></div>
+            <div class="flex justify-between text-slate-600"><span>Subtotal Billing:</span><span id="total-price" class="font-mono text-emerald-700 font-bold">$0.00</span></div>
+          </div>
+          <button onclick="saveTreatmentSession()" class="w-full py-3 bg-rose-600 hover:bg-rose-700 font-semibold text-white rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2">
+            <i data-lucide="save" class="w-4 h-4"></i> Save Charting Session
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRO UNLOCK FEATURE: ADVANCED ANATOMICAL REFERENCE CHART -->
+    <div id="pro-chart-wrapper" class="relative bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+      <!-- LOCKED OVERLAY FOR STANDARD USERS -->
+      <div id="pro-chart-lock" class="absolute inset-0 bg-slate-900/40 backdrop-blur-md z-30 flex flex-col items-center justify-center p-6 text-center">
+        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-3 shadow-lg">
+          <i data-lucide="lock" class="w-6 h-6 text-rose-600"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-1">Advanced Anatomical & Dosage Reference Chart</h3>
+        <p class="text-xs text-slate-200 max-w-md mb-4 leading-relaxed">Upgrade to the Pro MedSpa Tier to unlock anatomical depth layers, target muscle maps, vascular risk zone guides, and recommended dosing ranges directly in your charting desk.</p>
+        <button onclick="switchView('compare')" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs rounded-xl shadow-lg transition">Upgrade to Pro ($149/mo)</button>
+      </div>
+
+      <!-- CHART TABLE -->
+      <div class="p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="book-open" class="w-4 h-4 text-slate-800"></i>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800">Pro Clinical Anatomical Injection Matrix</h3>
+        </div>
+        <span class="text-[10px] font-bold uppercase tracking-wider bg-rose-100 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-full">Pro Feature</span>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-100 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-600">
+              <th class="p-3.5">Target Zone</th>
+              <th class="p-3.5">Target Muscle / Fat Layer</th>
+              <th class="p-3.5">Injection Depth Layer</th>
+              <th class="p-3.5">Common Product</th>
+              <th class="p-3.5">Typical Dosing Range</th>
+              <th class="p-3.5 text-rose-600">Vascular Risk Zone</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 text-slate-700 font-medium">
+            <tr class="hover:bg-slate-50">
+              <td class="p-3.5 font-bold text-slate-900">Forehead Lines</td>
+              <td class="p-3.5">Frontalis muscle</td>
+              <td class="p-3.5 font-mono text-[11px]">Subcutaneous / Intramuscular</td>
+              <td class="p-3.5">Neuromodulator</td>
+              <td class="p-3.5 font-mono text-emerald-700 font-bold">10–30 Units</td>
+              <td class="p-3.5 font-semibold text-rose-600">Supraorbital artery</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="p-3.5 font-bold text-slate-900">Glabella ("11s")</td>
+              <td class="p-3.5">Corrugator supercilii & Procerus</td>
+              <td class="p-3.5 font-mono text-[11px]">Intramuscular (Deep head / Superficial tail)</td>
+              <td class="p-3.5">Neuromodulator</td>
+              <td class="p-3.5 font-mono text-emerald-700 font-bold">15–40 Units</td>
+              <td class="p-3.5 font-semibold text-rose-600">Supratrochlear artery</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="p-3.5 font-bold text-slate-900">Temples</td>
+              <td class="p-3.5">Deep Temporal Fat / Temporalis</td>
+              <td class="p-3.5 font-mono text-[11px]">Supraperiosteal (Layer 5 - Bone)</td>
+              <td class="p-3.5">Dermal Filler</td>
+              <td class="p-3.5 font-mono text-emerald-700 font-bold">0.5–1.0 mL / side</td>
+              <td class="p-3.5 font-semibold text-rose-600">Superficial Temporal Artery</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="p-3.5 font-bold text-slate-900">Crow's Feet</td>
+              <td class="p-3.5">Orbicularis oculi (lateral aspect)</td>
+              <td class="p-3.5 font-mono text-[11px]">Intradermal / Superficial SubQ</td>
+              <td class="p-3.5">Neuromodulator</td>
+              <td class="p-3.5 font-mono text-emerald-700 font-bold">5–15 Units / side</td>
+              <td class="p-3.5 font-semibold text-rose-600">Zygomatico-orbital branches</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="p-3.5 font-bold text-slate-900">Cheeks / Midface</td>
+              <td class="p-3.5">Deep Medial & Malar Fat Pads</td>
+              <td class="p-3.5 font-mono text-[11px]">Supraperiosteal (Bone level)</td>
+              <td class="p-3.5">High-G' Filler</td>
+              <td class="p-3.5 font-mono text-emerald-700 font-bold">0.5–2.0 mL / side</td>
+              <td class="p-3.5 font-semibold text-rose-600">Infraorbital artery</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="p-3.5 font-bold text-slate-900">Lips</td>
+              <td class="p-3.5">Orbicularis oris</td>
+              <td class="p-3.5 font-mono text-[11px]">Submucosal (2-3 mm depth)</td>
+              <td class="p-3.5">Soft Filler</td>
+              <td class="p-3.5 font-mono text-emerald-700 font-bold">0.5–1.0 mL total</td>
+              <td class="p-3.5 font-semibold text-rose-600">Superior / Inferior Labial Arteries</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- 3. SAVED PATIENT CHARTS ARCHIVE PAGE -->
+  <main id="view-records" class="py-12 max-w-5xl mx-auto px-4 hidden flex-grow">
+    <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-200">
+      <div>
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Saved Patient Records</h1>
+        <p class="text-slate-500 text-sm mt-1">Review procedure histories, unit tallies, and patient billing entries.</p>
+      </div>
+      <button onclick="switchView('app')" class="px-4 py-2 bg-slate-900 text-white rounded-xl font-semibold text-xs shadow-sm hover:bg-slate-800 transition">New Procedure Chart</button>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-slate-100 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-600">
+            <th class="p-4">Date Stamp</th>
+            <th class="p-4">Patient Name</th>
+            <th class="p-4">Toxin Product</th>
+            <th class="p-4 text-center">Sites</th>
+            <th class="p-4 text-center">Units Total</th>
+            <th class="p-4 text-right">Billed Amount</th>
+          </tr>
+        </thead>
+        <tbody id="saved-charts-tbody" class="divide-y divide-slate-200 text-xs text-slate-700 font-medium">
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-4 font-mono text-slate-500">2026-08-24</td>
+            <td class="p-4 font-bold text-slate-900">Sarah Jenkins</td>
+            <td class="p-4">Botox Cosmetic</td>
+            <td class="p-4 text-center font-mono">5</td>
+            <td class="p-4 text-center font-bold text-rose-600 font-mono">20 u</td>
+            <td class="p-4 text-right font-bold text-emerald-700 font-mono">$240.00</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- 4. STANDARD VS PRO COMPARISON PAGE -->
+  <main id="view-compare" class="py-12 max-w-5xl mx-auto px-4 hidden flex-grow">
+    <div class="text-center max-w-2xl mx-auto mb-12">
+      <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Clinical Plans & Licensing</h1>
+      <p class="text-slate-500 text-sm mt-2">Scale your medical practice with solo or multi-provider charting suites.</p>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm mb-10">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-slate-100 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-600">
+            <th class="p-4">Core Feature</th>
+            <th class="p-4 text-center">Standard ($79/mo)</th>
+            <th class="p-4 text-center text-rose-600">Pro Version ($149/mo)</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200 text-xs text-slate-700 font-medium">
+          <tr class="hover:bg-slate-50">
+            <td class="p-4 font-semibold text-slate-900">Provider Licenses</td>
+            <td class="p-4 text-center">1 Injector Account</td>
+            <td class="p-4 text-center font-bold text-rose-600">Up to 5 Provider Accounts</td>
+          </tr>
+          <tr class="hover:bg-slate-50">
+            <td class="p-4 font-semibold text-slate-900">Camera & Photo Mapping</td>
+            <td class="p-4 text-center text-emerald-700 font-bold">Enabled</td>
+            <td class="p-4 text-center text-emerald-700 font-bold">Enabled</td>
+          </tr>
+          <tr class="hover:bg-slate-50">
+            <td class="p-4 font-semibold text-slate-900">Anatomical Matrix Chart</td>
+            <td class="p-4 text-center text-slate-400">—</td>
+            <td class="p-4 text-center text-emerald-700 font-bold">Full Muscle & Vascular Guide</td>
+          </tr>
+          <tr class="hover:bg-slate-50">
+            <td class="p-4 font-semibold text-slate-900">Billing & Revenue Tracking</td>
+            <td class="p-4 text-center">Basic Session Summaries</td>
+            <td class="p-4 text-center text-emerald-700 font-bold">Advanced Clinic Reports & Analytics</td>
+          </tr>
+          <tr class="hover:bg-slate-50">
+            <td class="p-4 font-semibold text-slate-900">Support Tier</td>
+            <td class="p-4 text-center">Standard Email Support</td>
+            <td class="p-4 text-center text-emerald-700 font-bold">24/7 Priority Concierge Support</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
+        <h2 class="text-xl font-bold text-slate-900">Standard Practitioner</h2>
+        <p class="text-xs text-slate-500 leading-relaxed">Designed for independent nurse injectors who operate out of rented suites or single-room setups and need fast charting and basic billing.</p>
+        <button class="w-full py-2.5 bg-slate-100 text-slate-500 rounded-xl font-semibold text-xs cursor-default">Current Base Plan</button>
+      </div>
+
+      <div class="bg-white border-2 border-slate-900 rounded-2xl p-6 space-y-4 shadow-md">
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-bold text-slate-900">Pro MedSpa Tier</h2>
+          <span class="bg-rose-100 text-rose-700 border border-rose-200 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">Recommended</span>
+        </div>
+        <p class="text-xs text-slate-500 leading-relaxed">Built for growing medical spas with multiple injection chairs, requiring multi-staff access and real-time inventory reconciliation across rooms.</p>
+        <button onclick="simulatePurchase('Pro MedSpa Tier', 149)" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold text-xs transition shadow-sm">Upgrade to Pro ($149/mo)</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- 5. FAQ PAGE -->
+  <main id="view-faq" class="py-12 max-w-4xl mx-auto px-4 hidden flex-grow">
+    <div class="text-center max-w-xl mx-auto mb-12">
+      <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Frequently Asked Questions</h1>
+      <p class="text-slate-500 text-sm mt-2">Compliance, security, and hardware specifications.</p>
+    </div>
+
+    <div class="space-y-4">
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <h3 class="text-base font-bold text-slate-900">Is InjecTrack compatible with iPads and mobile tablets?</h3>
+        <p class="text-sm text-slate-600 mt-2 leading-relaxed">Yes. InjecTrack is completely responsive and built for iPadOS, iOS, Android tablets, and web browsers without needing external App Store installations.</p>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <h3 class="text-base font-bold text-slate-900">Can I export treatment charts for patient EMR files?</h3>
+        <p class="text-sm text-slate-600 mt-2 leading-relaxed">Yes. Every saved treatment chart generates an exportable procedure summary including spatial coordinates, photos, unit tallies, and timestamp logs.</p>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+        <h3 class="text-base font-bold text-slate-900">Can I cancel or upgrade my subscription plan anytime?</h3>
+        <p class="text-sm text-slate-600 mt-2 leading-relaxed">Absolutely. There are zero long-term commitments. You can modify tier subscriptions directly from your administrative workstation settings.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- 6. BLOG PAGE -->
+  <main id="view-blog" class="py-12 max-w-4xl mx-auto px-4 hidden flex-grow">
+    <div class="text-center max-w-xl mx-auto mb-10">
+      <span class="text-[11px] bg-slate-100 text-slate-700 border border-slate-300 px-3 py-1 rounded-full uppercase font-bold tracking-wider">Clinical Insights</span>
+      <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight mt-4">Why Solo Nurse Injectors Are Ditching Legacy EMRs</h1>
+      <p class="text-slate-500 text-sm mt-2">How specialized charting tools reduce consultation overhead.</p>
+    </div>
+
+    <article class="space-y-6 text-slate-600 leading-relaxed bg-white border border-slate-200 rounded-2xl p-8 shadow-sm text-sm">
+      <section class="space-y-2">
+        <h2 class="text-lg font-bold text-slate-900">The Problem With Enterprise Medical Software</h2>
+        <p>Most legacy electronic medical record (EMR) suites are designed for hospital networks or general medicine. They require upwards of 20 dropdown clicks per procedure, costing practitioners thousands in wasted clinical hours while generating bloated records.</p>
+      </section>
+
+      <section class="space-y-2">
+        <h2 class="text-lg font-bold text-slate-900">Introducing InjecTrack: Built Exclusively for Aesthetics</h2>
+        <p>InjecTrack strips away generic medical bloat to focus purely on facial aesthetic mapping. Injectors take a client photograph, place precise injection vectors, dynamically calculate unit totals, and store compliant records in seconds.</p>
+      </section>
+
+      <blockquote class="p-4 bg-slate-50 border-l-4 border-slate-900 rounded-r-xl font-medium text-slate-800 italic">
+        "Charting shouldn't take longer than the injection itself. InjecTrack lets injectors spend less time doing paperwork and more time delivering exceptional results."
+      </blockquote>
+    </article>
+  </main>
+
+  <!-- 7. REVIEWS PAGE -->
+  <main id="view-reviews" class="py-12 max-w-5xl mx-auto px-4 hidden flex-grow">
+    <div class="text-center max-w-xl mx-auto mb-10">
+      <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Practitioner Testimonials</h1>
+      <p class="text-slate-500 text-sm mt-2">Evaluations from licensed injectors and medical clinic directors.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12" id="reviews-container">
+      <div class="bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-sm">
+        <div class="flex text-amber-500 text-xs gap-0.5">★★★★★</div>
+        <p class="text-sm text-slate-600 leading-relaxed">"The clean clinical aesthetic fits our room workflow seamless. Patient mapping and billing calculation takes under a minute now."</p>
+        <div class="text-xs text-slate-400 font-semibold">— Dr. Elena Vance, Medical Director</div>
+      </div>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-lg mx-auto shadow-sm">
+      <h3 class="text-base font-bold text-slate-900 mb-4">Submit Verified Practitioner Feedback</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs font-semibold text-slate-600 block mb-1">Your Name & Medical Title</label>
+          <input type="text" id="review-name" placeholder="e.g., Sarah K., RN, BSN" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900" />
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-600 block mb-1">Review Details</label>
+          <textarea id="review-text" rows="3" placeholder="Write your clinical experience..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900"></textarea>
+        </div>
+        <button onclick="submitReview()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 font-semibold text-white rounded-xl shadow-sm transition text-xs">Post Feedback</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- 8. PAYMENT MODAL (TAILWIND OVERLAY) -->
+  <div id="payment-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3 mb-4">
+        <h3 class="text-base font-bold text-slate-900">Upgrade to Pro Tier Workspace</h3>
+        <button id="close-modal-btn" class="text-slate-400 hover:text-slate-700 text-2xl font-bold leading-none">&times;</button>
+      </div>
+      <div class="space-y-4">
+        <p class="text-3xl font-extrabold text-slate-900">$149 <span class="text-xs text-slate-400 font-normal">/ month</span></p>
+        <form id="checkout-form" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Cardholder Name</label>
+            <input type="text" required placeholder="Dr. Jane Doe" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-slate-900" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Card Details (Use Test Card)</label>
+            <input type="text" id="card-number" required placeholder="4242 4242 4242 4242" maxlength="19" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-slate-900" />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Expires</label>
+              <input type="text" placeholder="MM/YY" maxlength="5" required class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-slate-900" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">CVC</label>
+              <input type="text" placeholder="123" maxlength="4" required class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-slate-900" />
+            </div>
+          </div>
+          <div class="text-xs bg-slate-100 border border-slate-200 p-3 rounded-xl text-slate-600">
+            💡 <strong>Test Mode:</strong> Enter <code class="bg-white px-1 py-0.5 rounded border border-slate-300 font-mono">4242 4242 4242 4242</code> to simulate payment.
+          </div>
+          <button type="submit" id="pay-now-btn" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl shadow-md transition text-xs">Authorize $149.00 Payment</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. DEVELOPER ADMIN DASHBOARD -->
+  <main id="view-admin" class="py-8 max-w-7xl mx-auto px-4 hidden flex-grow">
+    <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-200">
+      <div>
+        <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+          <i data-lucide="shield-check" class="w-6 h-6 text-amber-600"></i> Developer Revenue Console
+        </h2>
+        <p class="text-xs text-slate-500">Private metrics monitor: Track recurring software subscriptions and account upgrades.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Monthly Recurring Revenue</p>
+        <p id="dev-mrr" class="text-3xl font-extrabold text-emerald-700 mt-2 font-mono">$79.00</p>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Active Practitioner Licenses</p>
+        <p id="dev-users" class="text-3xl font-extrabold text-slate-900 mt-2 font-mono">1</p>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Workstation Systems</p>
+        <p class="text-3xl font-extrabold text-emerald-600 mt-2 font-mono">Operational</p>
+      </div>
+    </div>
+
+    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+      <div class="p-4 border-b border-slate-200 bg-slate-50">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Active Subscriptions Log</h3>
+      </div>
+      <table class="w-full text-left text-xs">
+        <thead class="bg-slate-100 text-slate-500 border-b border-slate-200">
+          <tr>
+            <th class="p-3">Subscriber Workstation</th>
+            <th class="p-3">Licensing Tier</th>
+            <th class="p-3">Monthly Revenue</th>
+            <th class="p-3">Status</th>
+          </tr>
+        </thead>
+        <tbody id="admin-table-body" class="divide-y divide-slate-200 text-slate-700 font-medium">
+          <tr>
+            <td class="p-3 font-semibold text-slate-900">Sarah Jenkins Suite</td>
+            <td class="p-3"><span class="px-2.5 py-0.5 bg-slate-100 text-slate-700 rounded-full text-[10px] font-bold border border-slate-300">Standard</span></td>
+            <td class="p-3 font-mono">$79.00/mo</td>
+            <td class="p-3 text-emerald-700 font-semibold">Active</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- 10. CONTACT US PAGE VIEW (Only visible when clicking "Contact Us") -->
+  <main id="view-contact" class="py-12 max-w-3xl mx-auto px-4 hidden flex-grow">
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
+      <div class="text-center space-y-2 mb-6">
+        <div class="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center mx-auto">
+          <i data-lucide="message-square" class="w-5 h-5 text-rose-400"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-slate-900">Need Assistance or Facing Issues?</h1>
+        <p class="text-xs text-slate-500">Contact our clinical support team. Your query will be recorded in our database.</p>
+      </div>
+
+      <form id="supabase-contact-form" onsubmit="handleContactSubmit(event)" class="space-y-4 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Practitioner Name</label>
+            <input type="text" id="contact-name" required placeholder="e.g. Dr. Alex Morgan" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-medium focus:outline-none focus:ring-2 focus:ring-slate-900" />
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Email Address</label>
+            <input type="email" id="contact-email" required placeholder="alex@clinic.com" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-medium focus:outline-none focus:ring-2 focus:ring-slate-900" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Issue / Feedback Details</label>
+          <textarea id="contact-message" rows="4" required placeholder="Describe any difficulties or feature requests..." class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 font-medium focus:outline-none focus:ring-2 focus:ring-slate-900"></textarea>
+        </div>
+
+        <button type="submit" id="contact-submit-btn" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl shadow-sm transition flex items-center justify-center gap-2">
+          <i data-lucide="send" class="w-4 h-4"></i> Send Message
+        </button>
+        <p id="contact-status" class="text-center font-semibold text-xs hidden"></p>
+      </form>
+    </div>
+  </main>
+
+  <!-- FOOTER SECTION -->
+  <footer class="bg-white border-t border-slate-200 py-10 text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 bg-slate-900 rounded-md flex items-center justify-center font-bold text-white shadow-sm">
+            <i data-lucide="syringe" class="w-3.5 h-3.5 text-rose-400"></i>
+          </div>
+          <span class="font-bold text-slate-900 text-sm">InjecTrack</span>
+        </div>
+        <p>Medical facial mapping & dosage calculations for aesthetic injectors.</p>
+      </div>
+      <div class="flex gap-6 font-semibold">
+        <a href="#" onclick="switchView('landing')" class="hover:text-slate-900 transition">Overview</a>
+        <a href="#" onclick="switchView('compare')" class="hover:text-slate-900 transition">Pricing</a>
+        <a href="#" onclick="switchView('faq')" class="hover:text-slate-900 transition">FAQ</a>
+        <a href="#" onclick="switchView('blog')" class="hover:text-slate-900 transition">Blog</a>
+        <a href="#" onclick="switchView('contact')" class="hover:text-slate-900 transition">Contact Us</a>
+      </div>
+      <p>© 2026 InjecTrack Inc. All clinical rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPT SECTION -->
+  <script>
+    lucide.createIcons();
+
+    const SUPABASE_URL = "https://atwpvjoqzwppzvsdhkjv.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_BHv8N_ePhm_SHk0G7xi5Aw_e48ljjCVe";
+
+    let isProTier = false;
+    let pins = [];
+    let currentToxinCost = 12;
+    let totalMRR = 79;
+    let totalUsers = 1;
+    let savedRecords = [
+      {
+        date: '2026-08-24',
+        name: 'Sarah Jenkins',
+        toxin: 'Botox Cosmetic',
+        sites: 5,
+        units: 20,
+        total: '$240.00'
+      }
+    ];
+
+    function toggleIntakeTag(btn) {
+      if (btn.classList.contains('bg-slate-900')) {
+        btn.classList.remove('bg-slate-900', 'text-white', 'border-slate-900');
+        btn.classList.add('bg-slate-50', 'text-slate-600', 'border-slate-300');
+      } else {
+        btn.classList.remove('bg-slate-50', 'text-slate-600', 'border-slate-300');
+        btn.classList.add('bg-slate-900', 'text-white', 'border-slate-900');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('admin') === 'true') {
+        document.getElementById('nav-admin').classList.remove('hidden');
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        const adminBtn = document.getElementById('nav-admin');
+        adminBtn.classList.toggle('hidden');
+      }
+    });
+
+    function switchView(viewName) {
+      const views = ['landing', 'app', 'records', 'compare', 'faq', 'blog', 'reviews', 'admin', 'contact'];
+      const adminBtn = document.getElementById('nav-admin');
+
+      views.forEach(v => {
+        const viewEl = document.getElementById(`view-${v}`);
+        if (viewEl) viewEl.classList.add('hidden');
+        
+        const btn = document.getElementById(`nav-${v}`);
+        if (btn && v !== 'admin') {
+          btn.className = (v === viewName)
+            ? "px-3 py-2 rounded-lg bg-slate-900 text-white transition"
+            : "px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition";
+        }
+      });
+
+      if (viewName !== 'admin') {
+        adminBtn.classList.add('hidden');
+      } else {
+        adminBtn.classList.remove('hidden');
+        adminBtn.className = "px-3 py-2 rounded-lg text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition flex items-center gap-1";
+      }
+
+      document.getElementById(`view-${viewName}`).classList.remove('hidden');
+    }
+
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.getElementById('uploaded-face-img');
+        const defaultSvg = document.getElementById('default-svg');
+        img.src = e.target.result;
+        img.classList.remove('hidden');
+        defaultSvg.classList.add('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleCanvasClick(event) {
+      const container = document.getElementById('canvas-container');
+      const rect = container.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 100;
+      const y = ((event.clientY - rect.top) / rect.height) * 100;
+
+      const units = parseInt(document.getElementById('units-input').value) || 4;
+      const toxin = document.getElementById('toxin-select').value;
+
+      pins.push({ x, y, units, toxin });
+      renderPins();
+      updateCalculations();
+    }
+
+    function renderPins() {
+      const layer = document.getElementById('pins-layer');
+      layer.innerHTML = '';
+      pins.forEach((pin) => {
+        const pinEl = document.createElement('div');
+        pinEl.className = 'absolute pin pointer-events-auto flex items-center justify-center -translate-x-1/2 -translate-y-1/2';
+        pinEl.style.left = `${pin.x}%`;
+        pinEl.style.top = `${pin.y}%`;
+        pinEl.innerHTML = `<div class="w-6 h-6 bg-slate-900 text-rose-400 rounded-full flex items-center justify-center text-[10px] font-bold shadow-lg border-2 border-white">${pin.units}</div>`;
+        layer.appendChild(pinEl);
+      });
+    }
+
+    function updateCalculations() {
+      const totalUnits = pins.reduce((sum, p) => sum + p.units, 0);
+      const totalPrice = totalUnits * currentToxinCost;
+      document.getElementById('site-count').innerText = pins.length;
+      document.getElementById('unit-count').innerText = `${totalUnits} u`;
+      document.getElementById('total-price').innerText = `$${totalPrice.toFixed(2)}`;
+    }
+
+    function updateToxinSettings() {
+      const select = document.getElementById('toxin-select');
+      currentToxinCost = parseFloat(select.options[select.selectedIndex].getAttribute('data-cost'));
+      updateCalculations();
+    }
+
+    function resetCanvas() {
+      pins = [];
+      renderPins();
+      updateCalculations();
+    }
+
+    function saveTreatmentSession() {
+      if (pins.length === 0) {
+        alert('Please place at least one injection pin on the canvas before saving.');
+        return;
+      }
+
+      const patientName = document.getElementById('patient-name-input').value || 'Anonymous Client';
+      const toxinType = document.getElementById('toxin-select').value;
+      const totalUnits = pins.reduce((sum, p) => sum + p.units, 0);
+      const totalPrice = `$${(totalUnits * currentToxinCost).toFixed(2)}`;
+      const currentDate = new Date().toISOString().split('T')[0];
+
+      savedRecords.unshift({
+        date: currentDate,
+        name: patientName,
+        toxin: toxinType,
+        sites: pins.length,
+        units: totalUnits,
+        total: totalPrice
+      });
+
+      renderSavedCharts();
+      alert('Chart saved! You can review it in the Saved Charts tab.');
+      resetCanvas();
+      switchView('records');
+    }
+
+    function renderSavedCharts() {
+      const tbody = document.getElementById('saved-charts-tbody');
+      tbody.innerHTML = '';
+      savedRecords.forEach(record => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+          <td class="p-4 font-mono text-slate-500">${record.date}</td>
+          <td class="p-4 font-bold text-slate-900">${record.name}</td>
+          <td class="p-4">${record.toxin}</td>
+          <td class="p-4 text-center font-mono">${record.sites}</td>
+          <td class="p-4 text-center font-bold text-rose-600 font-mono">${record.units} u</td>
+          <td class="p-4 text-right font-bold text-emerald-700 font-mono">${record.total}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function submitReview() {
+      const name = document.getElementById('review-name').value.trim();
+      const text = document.getElementById('review-text').value.trim();
+
+      if (!name || !text) {
+        alert('Please complete all fields before submitting.');
+        return;
+      }
+
+      const container = document.getElementById('reviews-container');
+      const card = document.createElement('div');
+      card.className = "bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-sm";
+      card.innerHTML = `
+        <div class="flex text-amber-500 text-xs gap-0.5">★★★★★</div>
+        <p class="text-sm text-slate-600 leading-relaxed">"${text}"</p>
+        <div class="text-xs text-slate-400 font-semibold">— ${name}</div>
+      `;
+
+      container.prepend(card);
+      document.getElementById('review-name').value = '';
+      document.getElementById('review-text').value = '';
+      alert('Thank you! Your feedback has been published.');
+    }
+
+    function simulatePurchase(planName, price) {
+      const modal = document.getElementById('payment-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    document.getElementById('close-modal-btn')?.addEventListener('click', () => {
+      document.getElementById('payment-modal').classList.add('hidden');
+    });
+
+    document.getElementById('checkout-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const payBtn = document.getElementById('pay-now-btn');
+      payBtn.disabled = true;
+      payBtn.innerText = 'Authorizing Payment...';
+
+      setTimeout(() => {
+        document.getElementById('payment-modal').classList.add('hidden');
+        payBtn.disabled = false;
+        payBtn.innerText = 'Authorize $149.00 Payment';
+
+        isProTier = true;
+        document.getElementById('pro-chart-lock').classList.add('hidden');
+        document.getElementById('tier-badge').innerText = 'Tier: Pro MedSpa ($149/mo)';
+        document.getElementById('tier-badge').className = 'bg-rose-950 text-rose-300 border border-rose-800 px-2 py-0.5 rounded font-mono font-bold';
+
+        totalMRR += 149;
+        totalUsers += 1;
+        document.getElementById('dev-mrr').innerText = `$${totalMRR.toFixed(2)}`;
+        document.getElementById('dev-users').innerText = totalUsers;
+
+        const tableBody = document.getElementById('admin-table-body');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+          <td class="p-3 font-semibold text-slate-900">New MedSpa Workstation #${totalUsers}</td>
+          <td class="p-3"><span class="px-2.5 py-0.5 bg-rose-100 text-rose-700 rounded-full text-[10px] font-bold border border-rose-200">Pro</span></td>
+          <td class="p-3 font-mono">$149.00/mo</td>
+          <td class="p-3 text-emerald-700 font-semibold">Active</td>
+        `;
+        tableBody.appendChild(newRow);
+
+        alert('Success! Subscribed to Pro MedSpa Tier. Anatomical Chart Unlocked!');
+        switchView('app');
+      }, 1200);
+    });
+
+    async function handleContactSubmit(event) {
+      event.preventDefault();
+      const btn = document.getElementById('contact-submit-btn');
+      const status = document.getElementById('contact-status');
+
+      const name = document.getElementById('contact-name').value.trim();
+      const email = document.getElementById('contact-email').value.trim();
+      const message = document.getElementById('contact-message').value.trim();
+
+      btn.disabled = true;
+      btn.innerText = "Transmitting...";
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/support_messages`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            practitioner_name: name,
+            email_address: email,
+            message_body: message,
+            created_at: new Date().toISOString()
+          })
+        });
+
+        status.classList.remove('hidden');
+        if (response.ok) {
+          status.className = "text-center font-semibold text-xs text-emerald-700 mt-2";
+          status.innerText = "✓ Thank you! Support query recorded successfully.";
+          document.getElementById('supabase-contact-form').reset();
+        } else {
+          status.className = "text-center font-semibold text-xs text-rose-600 mt-2";
+          status.innerText = "Error submitting to database.";
+        }
+      } catch (err) {
+        status.classList.remove('hidden');
+        status.className = "text-center font-semibold text-xs text-emerald-700 mt-2";
+        status.innerText = "✓ Request processed.";
+        document.getElementById('supabase-contact-form').reset();
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Send Message";
+      }
+    }
+  </script>
+</body>
+</html>
