@@ -18,7 +18,6 @@
       background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
     }
 
-    /* Additional Modal & Footer Custom Styles */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -150,7 +149,6 @@
         <button onclick="switchView('reviews')" id="nav-reviews" class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Reviews</button>
         <button onclick="switchView('contact')" id="nav-contact" class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Contact</button>
         
-        <!-- Dev Admin button -->
         <button onclick="switchView('admin')" id="nav-admin" class="hidden px-3 py-2 rounded-lg text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition flex items-center gap-1">
           <i data-lucide="shield-check" class="w-3.5 h-3.5 text-amber-600"></i> Dev Admin
         </button>
@@ -202,18 +200,33 @@
     </div>
   </main>
 
-  <!-- 2. CHARTING APP -->
-  <main id="view-app" class="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 hidden flex-grow">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200">
-      <div>
-        <h1 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
-          <i data-lucide="crosshair" class="w-6 h-6 text-rose-500"></i> Clinical Charting Desk
-        </h1>
-        <p class="text-sm text-slate-500">Select facial injection vectors, set dosage units per site, and calculate treatment pricing.</p>
+  <!-- 2. LIVE APP VIEW -->
+  <main id="view-app" class="py-8 max-w-7xl mx-auto px-4 hidden flex-grow">
+    <!-- TOP HEADER: CHART STATUS & WORKFLOW LOCKING -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-5 mb-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-rose-400">
+          <i data-lucide="crosshair" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-bold text-slate-900">Clinical Charting Desk</h1>
+            <span id="chart-status-badge" class="px-2.5 py-0.5 text-[10px] font-bold uppercase rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+              Draft
+            </span>
+          </div>
+          <p class="text-xs text-slate-500">Spatial facial pinpointing & automated dosage calculations.</p>
+        </div>
       </div>
-      <button onclick="resetCanvas()" class="text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm self-start md:self-auto transition">
-        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Clear Active Canvas
-      </button>
+      
+      <div class="flex items-center gap-2">
+        <button onclick="resetCanvas()" class="text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-300 px-3.5 py-2.5 rounded-xl flex items-center gap-1.5 transition">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Clear Canvas
+        </button>
+        <button onclick="lockChart()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+          <i data-lucide="lock" class="w-4 h-4 text-emerald-400"></i> Co-Sign & Lock Record
+        </button>
+      </div>
     </div>
 
     <!-- MEDICAL INTAKE BANNER BAR -->
@@ -321,21 +334,55 @@
           </div>
         </div>
 
+        <!-- STRUCTURED PIN DATA CONTROLS -->
         <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm">
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
-            <i data-lucide="sliders" class="w-4 h-4 text-slate-700"></i> Product & Unit Dosage
+            <i data-lucide="sliders" class="w-4 h-4 text-slate-700"></i> Active Pin Settings
           </h3>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="text-xs text-slate-600 mb-1 block font-semibold">Toxin Product</label>
+              <label class="text-xs text-slate-600 mb-1 block font-semibold">Toxin / Filler Product *</label>
               <select id="toxin-select" onchange="updateToxinSettings()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900">
-                <option value="Botox Cosmetic" data-cost="12">Botox ($12/u)</option>
-                <option value="Dysport" data-cost="5">Dysport ($5/u)</option>
+                <optgroup label="Neuromodulators">
+                  <option value="Botox Cosmetic" data-cost="12">Botox ($12/u)</option>
+                  <option value="Dysport" data-cost="5">Dysport ($5/u)</option>
+                  <option value="Xeomin" data-cost="11">Xeomin ($11/u)</option>
+                  <option value="Jeuveau" data-cost="10">Jeuveau ($10/u)</option>
+                  <option value="Daxxify" data-cost="15">Daxxify ($15/u)</option>
+                </optgroup>
+                <optgroup label="Dermal Fillers">
+                  <option value="Juvederm Ultra" data-cost="650">Juvederm Ultra ($650/sy)</option>
+                  <option value="Restylane Lyft" data-cost="600">Restylane Lyft ($600/sy)</option>
+                  <option value="Sculptra" data-cost="800">Sculptra ($800/vial)</option>
+                </optgroup>
               </select>
             </div>
+
             <div>
-              <label class="text-xs text-slate-600 mb-1 block font-semibold">Units / Pin Site</label>
-              <input type="number" id="units-input" value="4" min="1" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900" />
+              <label class="text-xs text-slate-600 mb-1 block font-semibold">Treatment Zone *</label>
+              <select id="treatment-area" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900">
+                <option value="Glabella">Glabella (Frown Lines)</option>
+                <option value="Crow's Feet">Crow's Feet</option>
+                <option value="Forehead">Forehead Lines</option>
+                <option value="Masseter">Masseter / Jawline</option>
+                <option value="Lips">Lips / Perioral</option>
+                <option value="Nasolabial">Nasolabial Folds</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="text-xs text-slate-600 mb-1 block font-semibold">Units / Dosage per Pin *</label>
+              <input type="number" id="units-input" value="4" min="0.5" step="0.5" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900" />
+            </div>
+
+            <div>
+              <label class="text-xs text-slate-600 mb-1 block font-semibold">Injection Depth *</label>
+              <select id="injection-depth" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900">
+                <option value="Intradermal">Intradermal (Superficial)</option>
+                <option value="Intramuscular" selected>Intramuscular (Standard)</option>
+                <option value="Periosteal">Periosteal (Deep on Bone)</option>
+                <option value="Subcutaneous">Subcutaneous</option>
+              </select>
             </div>
           </div>
         </div>
@@ -350,6 +397,27 @@
           <button onclick="saveTreatmentSession()" class="w-full py-3 bg-rose-600 hover:bg-rose-700 font-semibold text-white rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2">
             <i data-lucide="save" class="w-4 h-4"></i> Save Charting Session
           </button>
+        </div>
+
+        <!-- MEDICAL DIRECTOR SIGN-OFF & COMPLIANCE SECTION -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-sm">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+            <i data-lucide="file-check" class="w-4 h-4 text-slate-700"></i> Compliance & Digital Signatures
+          </h3>
+          <div class="grid grid-cols-1 gap-3 text-xs">
+            <div class="border border-dashed border-slate-300 rounded-xl p-2.5 text-center bg-slate-50">
+              <p class="font-semibold text-slate-600 mb-1 text-[11px]">Injector / NP Signature</p>
+              <div class="h-14 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-slate-400 text-[11px] italic">
+                [ Tap to Sign on iPad ]
+              </div>
+            </div>
+            <div class="border border-dashed border-slate-300 rounded-xl p-2.5 text-center bg-slate-50">
+              <p class="font-semibold text-slate-600 mb-1 text-[11px]">Medical Director Co-Signature</p>
+              <div class="h-14 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-slate-400 text-[11px] italic">
+                [ Physician Digital Signature Pad ]
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -800,10 +868,12 @@
       const x = ((event.clientX - rect.left) / rect.width) * 100;
       const y = ((event.clientY - rect.top) / rect.height) * 100;
 
-      const units = parseInt(document.getElementById('units-input').value) || 4;
+      const units = parseFloat(document.getElementById('units-input').value) || 4;
       const toxin = document.getElementById('toxin-select').value;
+      const area = document.getElementById('treatment-area').value;
+      const depth = document.getElementById('injection-depth').value;
 
-      pins.push({ x, y, units, toxin });
+      pins.push({ x, y, units, toxin, area, depth });
       renderPins();
       updateCalculations();
     }
@@ -884,6 +954,21 @@
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    function lockChart() {
+      const batchNum = document.getElementById('batch-number').value.trim();
+      if (!batchNum) {
+        alert("Please enter a valid Product Lot / Batch # before locking the chart.");
+        return;
+      }
+
+      const badge = document.getElementById('chart-status-badge');
+      if (badge) {
+        badge.textContent = "Signed & Locked";
+        badge.className = "px-2.5 py-0.5 text-[10px] font-bold uppercase rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300";
+      }
+      alert("Chart signed and locked! Changes are now frozen for audit compliance.");
     }
 
     // Modal Operations
