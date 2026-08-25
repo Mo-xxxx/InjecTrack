@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InjecTrack | Aesthetic Charting Platform</title>
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-javascript@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
@@ -14,6 +16,98 @@
     .grid-bg {
       background-size: 20px 20px;
       background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+    }
+
+    /* Additional Modal & Footer Custom Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .modal-card {
+      background: #ffffff;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 420px;
+      padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 12px;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #64748b;
+    }
+    .plan-price {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 16px 0;
+      color: #0f172a;
+    }
+    .plan-price span {
+      font-size: 14px;
+      color: #64748b;
+      font-weight: 400;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 12px;
+    }
+    .form-group label {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #475569;
+    }
+    .form-group input {
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .test-notice {
+      font-size: 12px;
+      background: #f1f5f9;
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: #334155;
+      margin: 12px 0;
+    }
+    .submit-pay-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #991b1b;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .submit-pay-btn:hover {
+      background-color: #7f1d1d;
     }
   </style>
 </head>
@@ -54,8 +148,9 @@
         <button onclick="switchView('faq')" id="nav-faq" class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">FAQ</button>
         <button onclick="switchView('blog')" id="nav-blog" class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Blog</button>
         <button onclick="switchView('reviews')" id="nav-reviews" class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Reviews</button>
+        <button onclick="switchView('contact')" id="nav-contact" class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">Contact</button>
         
-        <!-- Secret Dev Admin button -->
+        <!-- Dev Admin button -->
         <button onclick="switchView('admin')" id="nav-admin" class="hidden px-3 py-2 rounded-lg text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition flex items-center gap-1">
           <i data-lucide="shield-check" class="w-3.5 h-3.5 text-amber-600"></i> Dev Admin
         </button>
@@ -63,7 +158,7 @@
     </div>
   </header>
 
-  <!-- 1. LANDING & INTRODUCTION PAGE -->
+  <!-- 1. LANDING PAGE -->
   <main id="view-landing" class="py-16 max-w-6xl mx-auto px-4 flex-grow">
     <div class="text-center max-w-3xl mx-auto mb-16 space-y-6">
       <div class="inline-flex items-center gap-2 border border-rose-200 bg-rose-50 px-3 py-1 rounded-full text-xs font-semibold text-rose-700">
@@ -164,7 +259,7 @@
         </div>
       </div>
 
-      <!-- CLICKABLE CLINICAL INTAKE TAGS -->
+      <!-- CLICKABLE INTAKE TAGS -->
       <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs">
         <span class="font-bold text-slate-500 uppercase text-[10px] tracking-wider mr-1">Medical Alerts & Consent:</span>
         <button onclick="toggleIntakeTag(this)" class="px-2.5 py-1 rounded-full border border-slate-300 bg-slate-50 text-slate-600 font-semibold hover:border-slate-400 transition flex items-center gap-1">
@@ -259,19 +354,17 @@
       </div>
     </div>
 
-    <!-- PRO UNLOCK FEATURE: ADVANCED ANATOMICAL REFERENCE CHART -->
+    <!-- PRO REFERENCE CHART -->
     <div id="pro-chart-wrapper" class="relative bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-      <!-- LOCKED OVERLAY FOR STANDARD USERS -->
       <div id="pro-chart-lock" class="absolute inset-0 bg-slate-900/40 backdrop-blur-md z-30 flex flex-col items-center justify-center p-6 text-center">
         <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-3 shadow-lg">
           <i data-lucide="lock" class="w-6 h-6 text-rose-600"></i>
         </div>
         <h3 class="text-xl font-bold text-white mb-1">Advanced Anatomical & Dosage Reference Chart</h3>
         <p class="text-xs text-slate-200 max-w-md mb-4 leading-relaxed">Upgrade to the Pro MedSpa Tier to unlock anatomical depth layers, target muscle maps, vascular risk zone guides, and recommended dosing ranges directly in your charting desk.</p>
-        <button onclick="switchView('compare')" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs rounded-xl shadow-lg transition">Upgrade to Pro ($149/mo)</button>
+        <button onclick="openModal()" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs rounded-xl shadow-lg transition">Upgrade to Pro ($149/mo)</button>
       </div>
 
-      <!-- CHART TABLE -->
       <div class="p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <i data-lucide="book-open" class="w-4 h-4 text-slate-800"></i>
@@ -317,30 +410,6 @@
               <td class="p-3.5 font-mono text-emerald-700 font-bold">0.5–1.0 mL / side</td>
               <td class="p-3.5 font-semibold text-rose-600">Superficial Temporal Artery</td>
             </tr>
-            <tr class="hover:bg-slate-50">
-              <td class="p-3.5 font-bold text-slate-900">Crow's Feet</td>
-              <td class="p-3.5">Orbicularis oculi (lateral aspect)</td>
-              <td class="p-3.5 font-mono text-[11px]">Intradermal / Superficial SubQ</td>
-              <td class="p-3.5">Neuromodulator</td>
-              <td class="p-3.5 font-mono text-emerald-700 font-bold">5–15 Units / side</td>
-              <td class="p-3.5 font-semibold text-rose-600">Zygomatico-orbital branches</td>
-            </tr>
-            <tr class="hover:bg-slate-50">
-              <td class="p-3.5 font-bold text-slate-900">Cheeks / Midface</td>
-              <td class="p-3.5">Deep Medial & Malar Fat Pads</td>
-              <td class="p-3.5 font-mono text-[11px]">Supraperiosteal (Bone level)</td>
-              <td class="p-3.5">High-G' Filler</td>
-              <td class="p-3.5 font-mono text-emerald-700 font-bold">0.5–2.0 mL / side</td>
-              <td class="p-3.5 font-semibold text-rose-600">Infraorbital artery</td>
-            </tr>
-            <tr class="hover:bg-slate-50">
-              <td class="p-3.5 font-bold text-slate-900">Lips</td>
-              <td class="p-3.5">Orbicularis oris</td>
-              <td class="p-3.5 font-mono text-[11px]">Submucosal (2-3 mm depth)</td>
-              <td class="p-3.5">Soft Filler</td>
-              <td class="p-3.5 font-mono text-emerald-700 font-bold">0.5–1.0 mL total</td>
-              <td class="p-3.5 font-semibold text-rose-600">Superior / Inferior Labial Arteries</td>
-            </tr>
           </tbody>
         </table>
       </div>
@@ -383,7 +452,7 @@
     </div>
   </main>
 
-  <!-- 4. STANDARD VS PRO COMPARISON PAGE -->
+  <!-- 4. COMPARISON PAGE -->
   <main id="view-compare" class="py-12 max-w-5xl mx-auto px-4 hidden flex-grow">
     <div class="text-center max-w-2xl mx-auto mb-12">
       <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Clinical Plans & Licensing</h1>
@@ -415,16 +484,6 @@
             <td class="p-4 text-center text-slate-400">—</td>
             <td class="p-4 text-center text-emerald-700 font-bold">Full Muscle & Vascular Guide</td>
           </tr>
-          <tr class="hover:bg-slate-50">
-            <td class="p-4 font-semibold text-slate-900">Billing & Revenue Tracking</td>
-            <td class="p-4 text-center">Basic Session Summaries</td>
-            <td class="p-4 text-center text-emerald-700 font-bold">Advanced Clinic Reports & Analytics</td>
-          </tr>
-          <tr class="hover:bg-slate-50">
-            <td class="p-4 font-semibold text-slate-900">Support Tier</td>
-            <td class="p-4 text-center">Standard Email Support</td>
-            <td class="p-4 text-center text-emerald-700 font-bold">24/7 Priority Concierge Support</td>
-          </tr>
         </tbody>
       </table>
     </div>
@@ -442,7 +501,7 @@
           <span class="bg-rose-100 text-rose-700 border border-rose-200 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">Recommended</span>
         </div>
         <p class="text-xs text-slate-500 leading-relaxed">Built for growing medical spas with multiple injection chairs, requiring multi-staff access and real-time inventory reconciliation across rooms.</p>
-        <button onclick="simulatePurchase('Pro MedSpa Tier', 149)" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold text-xs transition shadow-sm">Upgrade to Pro ($149/mo)</button>
+        <button onclick="openModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold text-xs transition shadow-sm">Upgrade to Pro ($149/mo)</button>
       </div>
     </div>
   </main>
@@ -464,11 +523,6 @@
         <h3 class="text-base font-bold text-slate-900">Can I export treatment charts for patient EMR files?</h3>
         <p class="text-sm text-slate-600 mt-2 leading-relaxed">Yes. Every saved treatment chart generates an exportable procedure summary including spatial coordinates, photos, unit tallies, and timestamp logs.</p>
       </div>
-
-      <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-        <h3 class="text-base font-bold text-slate-900">Can I cancel or upgrade my subscription plan anytime?</h3>
-        <p class="text-sm text-slate-600 mt-2 leading-relaxed">Absolutely. There are zero long-term commitments. You can modify tier subscriptions directly from your administrative workstation settings.</p>
-      </div>
     </div>
   </main>
 
@@ -485,15 +539,6 @@
         <h2 class="text-lg font-bold text-slate-900">The Problem With Enterprise Medical Software</h2>
         <p>Most legacy electronic medical record (EMR) suites are designed for hospital networks or general medicine. They require upwards of 20 dropdown clicks per procedure, costing practitioners thousands in wasted clinical hours while generating bloated records.</p>
       </section>
-
-      <section class="space-y-2">
-        <h2 class="text-lg font-bold text-slate-900">Introducing InjecTrack: Built Exclusively for Aesthetics</h2>
-        <p>InjecTrack strips away generic medical bloat to focus purely on facial aesthetic mapping. Injectors take a client photograph, place precise injection vectors, dynamically calculate unit totals, and store compliant records in seconds.</p>
-      </section>
-
-      <blockquote class="p-4 bg-slate-50 border-l-4 border-slate-900 rounded-r-xl font-medium text-slate-800 italic">
-        "Charting shouldn't take longer than the injection itself. InjecTrack lets injectors spend less time doing paperwork and more time delivering exceptional results."
-      </blockquote>
     </article>
   </main>
 
@@ -511,57 +556,40 @@
         <div class="text-xs text-slate-400 font-semibold">— Dr. Elena Vance, Medical Director</div>
       </div>
     </div>
-
-    <div class="bg-white border border-slate-200 rounded-2xl p-6 max-w-lg mx-auto shadow-sm">
-      <h3 class="text-base font-bold text-slate-900 mb-4">Submit Verified Practitioner Feedback</h3>
-      <div class="space-y-4">
-        <div>
-          <label class="text-xs font-semibold text-slate-600 block mb-1">Your Name & Medical Title</label>
-          <input type="text" id="review-name" placeholder="e.g., Sarah K., RN, BSN" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900" />
-        </div>
-        <div>
-          <label class="text-xs font-semibold text-slate-600 block mb-1">Review Details</label>
-          <textarea id="review-text" rows="3" placeholder="Write your clinical experience..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900"></textarea>
-        </div>
-        <button onclick="submitReview()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 font-semibold text-white rounded-xl shadow-sm transition text-xs">Post Feedback</button>
-      </div>
-    </div>
   </main>
 
-  <!-- 8. PAYMENT MODAL (TAILWIND OVERLAY) -->
-  <div id="payment-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative">
-      <div class="flex justify-between items-center border-b border-slate-200 pb-3 mb-4">
+  <!-- 8. PAYMENT MODAL -->
+  <div id="payment-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
         <h3 class="text-base font-bold text-slate-900">Upgrade to Pro Tier Workspace</h3>
-        <button id="close-modal-btn" class="text-slate-400 hover:text-slate-700 text-2xl font-bold leading-none">&times;</button>
+        <button id="close-modal-btn" class="close-btn">&times;</button>
       </div>
-      <div class="space-y-4">
-        <p class="text-3xl font-extrabold text-slate-900">$149 <span class="text-xs text-slate-400 font-normal">/ month</span></p>
-        <form id="checkout-form" class="space-y-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">Cardholder Name</label>
-            <input type="text" required placeholder="Dr. Jane Doe" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-slate-900" />
+      <div class="plan-price">$149 <span>/ month</span></div>
+      <form id="checkout-form" class="space-y-3">
+        <div class="form-group">
+          <label>Cardholder Name</label>
+          <input type="text" required placeholder="Dr. Jane Doe" />
+        </div>
+        <div class="form-group">
+          <label>Card Details (Use Test Card)</label>
+          <input type="text" id="card-number" required placeholder="4242 4242 4242 4242" maxlength="19" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Expires</label>
+            <input type="text" placeholder="MM/YY" maxlength="5" required />
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">Card Details (Use Test Card)</label>
-            <input type="text" id="card-number" required placeholder="4242 4242 4242 4242" maxlength="19" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-slate-900" />
+          <div class="form-group">
+            <label>CVC</label>
+            <input type="text" placeholder="123" maxlength="4" required />
           </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Expires</label>
-              <input type="text" placeholder="MM/YY" maxlength="5" required class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-slate-900" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">CVC</label>
-              <input type="text" placeholder="123" maxlength="4" required class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-slate-900" />
-            </div>
-          </div>
-          <div class="text-xs bg-slate-100 border border-slate-200 p-3 rounded-xl text-slate-600">
-            💡 <strong>Test Mode:</strong> Enter <code class="bg-white px-1 py-0.5 rounded border border-slate-300 font-mono">4242 4242 4242 4242</code> to simulate payment.
-          </div>
-          <button type="submit" id="pay-now-btn" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl shadow-md transition text-xs">Authorize $149.00 Payment</button>
-        </form>
-      </div>
+        </div>
+        <div class="test-notice">
+          💡 <strong>Test Mode:</strong> Enter <code class="bg-white px-1 py-0.5 rounded border border-slate-300 font-mono">4242 4242 4242 4242</code> to simulate payment.
+        </div>
+        <button type="submit" id="pay-now-btn" class="submit-pay-btn">Authorize $149.00 Payment</button>
+      </form>
     </div>
   </div>
 
@@ -616,7 +644,7 @@
     </div>
   </main>
 
-  <!-- 10. CONTACT US PAGE VIEW (Only visible when clicking "Contact Us") -->
+  <!-- 10. CONTACT PAGE VIEW -->
   <main id="view-contact" class="py-12 max-w-3xl mx-auto px-4 hidden flex-grow">
     <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
       <div class="text-center space-y-2 mb-6">
@@ -652,7 +680,7 @@
     </div>
   </main>
 
-  <!-- FOOTER SECTION -->
+  <!-- FOOTER -->
   <footer class="bg-white border-t border-slate-200 py-10 text-xs text-slate-500">
     <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
       <div class="space-y-1">
@@ -669,7 +697,7 @@
         <a href="#" onclick="switchView('compare')" class="hover:text-slate-900 transition">Pricing</a>
         <a href="#" onclick="switchView('faq')" class="hover:text-slate-900 transition">FAQ</a>
         <a href="#" onclick="switchView('blog')" class="hover:text-slate-900 transition">Blog</a>
-        <a href="#" onclick="switchView('contact')" class="hover:text-slate-900 transition">Contact Us</a>
+        <a href="#" onclick="switchView('contact')" class="text-blue-600 hover:underline transition">Contact Us</a>
       </div>
       <p>© 2026 InjecTrack Inc. All clinical rights reserved.</p>
     </div>
@@ -679,8 +707,10 @@
   <script>
     lucide.createIcons();
 
+    // Initialize Supabase Client
     const SUPABASE_URL = "https://atwpvjoqzwppzvsdhkjv.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_BHv8N_ePhm_SHk0G7xi5Aw_e48ljjCVe";
+    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
     let isProTier = false;
     let pins = [];
@@ -745,7 +775,8 @@
         adminBtn.className = "px-3 py-2 rounded-lg text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition flex items-center gap-1";
       }
 
-      document.getElementById(`view-${viewName}`).classList.remove('hidden');
+      const activeView = document.getElementById(`view-${viewName}`);
+      if (activeView) activeView.classList.remove('hidden');
     }
 
     function handleImageUpload(event) {
@@ -855,47 +886,27 @@
       });
     }
 
-    function submitReview() {
-      const name = document.getElementById('review-name').value.trim();
-      const text = document.getElementById('review-text').value.trim();
+    // Modal Operations
+    const modal = document.getElementById('payment-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const checkoutForm = document.getElementById('checkout-form');
 
-      if (!name || !text) {
-        alert('Please complete all fields before submitting.');
-        return;
-      }
-
-      const container = document.getElementById('reviews-container');
-      const card = document.createElement('div');
-      card.className = "bg-white border border-slate-200 rounded-2xl p-6 space-y-3 shadow-sm";
-      card.innerHTML = `
-        <div class="flex text-amber-500 text-xs gap-0.5">★★★★★</div>
-        <p class="text-sm text-slate-600 leading-relaxed">"${text}"</p>
-        <div class="text-xs text-slate-400 font-semibold">— ${name}</div>
-      `;
-
-      container.prepend(card);
-      document.getElementById('review-name').value = '';
-      document.getElementById('review-text').value = '';
-      alert('Thank you! Your feedback has been published.');
+    function openModal() {
+      if (modal) modal.style.display = 'flex';
     }
 
-    function simulatePurchase(planName, price) {
-      const modal = document.getElementById('payment-modal');
-      if (modal) modal.classList.remove('hidden');
-    }
-
-    document.getElementById('close-modal-btn')?.addEventListener('click', () => {
-      document.getElementById('payment-modal').classList.add('hidden');
+    closeModalBtn?.addEventListener('click', () => {
+      if (modal) modal.style.display = 'none';
     });
 
-    document.getElementById('checkout-form')?.addEventListener('submit', (e) => {
+    checkoutForm?.addEventListener('submit', (e) => {
       e.preventDefault();
       const payBtn = document.getElementById('pay-now-btn');
       payBtn.disabled = true;
-      payBtn.innerText = 'Authorizing Payment...';
+      payBtn.innerText = 'Processing Payment...';
 
       setTimeout(() => {
-        document.getElementById('payment-modal').classList.add('hidden');
+        if (modal) modal.style.display = 'none';
         payBtn.disabled = false;
         payBtn.innerText = 'Authorize $149.00 Payment';
 
@@ -919,9 +930,9 @@
         `;
         tableBody.appendChild(newRow);
 
-        alert('Success! Subscribed to Pro MedSpa Tier. Anatomical Chart Unlocked!');
+        alert('Success! Your MedSpa account has been upgraded to the Pro Tier.');
         switchView('app');
-      }, 1200);
+      }, 1500);
     });
 
     async function handleContactSubmit(event) {
